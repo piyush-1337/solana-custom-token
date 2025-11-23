@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, system_program::{CreateAccount, create_account}};
-use anchor_spl::token_2022::{Token2022, spl_token_2022::{extension::ExtensionType, pod::PodMint}};
+use anchor_spl::{token_2022::{InitializeMint2, Token2022, initialize_mint2, spl_token_2022::{extension::ExtensionType, pod::PodMint}}, token_interface::{TransferFeeInitialize, transfer_fee_initialize}};
 
-pub fn _initialize(ctx: Context<InitializeContext>) -> Result<()> {
+pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) -> Result<()> {
 
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
@@ -20,6 +20,36 @@ pub fn _initialize(ctx: Context<InitializeContext>) -> Result<()> {
     );
 
     create_account(create_account_ctx, lamports, space as u64, &token_program.key())?;
+
+    let transfer_fee_init_ctx = CpiContext::new(
+        token_program.to_account_info(),
+        TransferFeeInitialize {
+            token_program_id: token_program.to_account_info(),
+            mint: to.to_account_info(),
+        }
+    );
+
+    transfer_fee_initialize(
+        transfer_fee_init_ctx,
+        None,
+        Some(&creator.key()),
+        fee_bps,
+        max_fee
+    )?;
+
+    let initialize_mint_ctx = CpiContext::new(
+        token_program.to_account_info(),
+        InitializeMint2 {
+            mint: to.to_account_info(),
+        }
+    );
+
+    initialize_mint2(
+        initialize_mint_ctx, 
+        9,
+        &creator.key(),
+        None
+    )?;
 
     Ok(())
 }
