@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_2022::{MintTo, Token2022, TransferChecked, mint_to, transfer_checked},
-    token_interface::{Mint, TokenAccount},
+    token_2022::{Token2022, TransferChecked, transfer_checked},
+    token_interface::TokenAccount,
 };
 
 pub fn _transfer(ctx: Context<TransferContext>, amount: u64) -> Result<()> {

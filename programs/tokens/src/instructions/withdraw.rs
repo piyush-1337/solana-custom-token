@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_2022::{MintTo, Token2022, mint_to},
+    token_2022::Token2022,
     token_interface::{Mint, TokenAccount, WithdrawWithheldTokensFromAccounts, withdraw_withheld_tokens_from_accounts},
 };
 
