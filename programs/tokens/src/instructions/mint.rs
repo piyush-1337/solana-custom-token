@@ -1,40 +1,30 @@
-use anchor_lang::{
-    prelude::*,
-    system_program::{create_account, CreateAccount},
-};
+use anchor_lang::prelude::*;
 use anchor_spl::{
-    token_2022::{
-        initialize_mint2,
-        spl_token_2022::{extension::ExtensionType, pod::PodMint},
-        InitializeMint2, Token2022,
-    },
-    token_interface::{transfer_fee_initialize, TransferFeeInitialize},
+    associated_token::AssociatedToken,
+    token_2022::{MintTo, Token2022, mint_to},
+    token_interface::{Mint, TokenAccount},
 };
 
 pub fn _mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
-    let system_program = &ctx.accounts.system_program;
+    if amount == 0 {
+        panic!("Invalid amount");
+    }
+
+    let recipient_ata = &ctx.accounts.recipient_ata;
     let token_program = &ctx.accounts.token_program;
     let creator = &ctx.accounts.creator;
-    let to = &ctx.accounts.mint;
+    let mint = &ctx.accounts.mint;
 
-    let space =
-        ExtensionType::try_calculate_account_len::<PodMint>(&[ExtensionType::TransferFeeConfig])?;
-    let lamports = Rent::get()?.minimum_balance(space);
-
-    let create_account_ctx = CpiContext::new(
-        system_program.to_account_info(),
-        CreateAccount {
-            from: creator.to_account_info(),
-            to: to.to_account_info(),
+    let mint_ctx = CpiContext::new(
+        token_program.to_account_info(),
+        MintTo {
+            authority: creator.to_account_info(),
+            mint: mint.to_account_info(),
+            to: recipient_ata.to_account_info(),
         },
     );
 
-    create_account(
-        create_account_ctx,
-        lamports,
-        space as u64,
-        &token_program.key(),
-    )?;
+    mint_to(mint_ctx, amount)?;
 
     Ok(())
 }
@@ -43,8 +33,23 @@ pub fn _mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
 pub struct MintContext<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
-    #[account(mut)]
-    pub mint: Signer<'info>,
+    #[account(
+        mut,
+        mint::authority = creator,
+        mint::token_program = token_program
+    )]
+    pub mint: InterfaceAccount<'info, Mint>,
+    /// Check: Recipient of the minted tokens
+    pub recipient: UncheckedAccount<'info>,
+    #[account(
+        init_if_needed,
+        payer = creator,
+        associated_token::mint = mint,
+        associated_token::authority = recipient,
+        associated_token::token_program = token_program
+    )]
+    pub recipient_ata: InterfaceAccount<'info, TokenAccount>,
     pub token_program: Program<'info, Token2022>,
     pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
