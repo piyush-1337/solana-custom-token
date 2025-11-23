@@ -2,29 +2,27 @@ use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_2022::{MintTo, Token2022, mint_to},
-    token_interface::{Mint, TokenAccount},
+    token_interface::{Mint, TokenAccount, WithdrawWithheldTokensFromAccounts, withdraw_withheld_tokens_from_accounts},
 };
 
-pub fn _withdraw(ctx: Context<WithdrawContext>, amount: u64) -> Result<()> {
-    if amount == 0 {
-        panic!("Invalid amount");
-    }
-
-    let recipient_ata = &ctx.accounts.recipient_ata;
+pub fn _withdraw(ctx: Context<WithdrawContext>) -> Result<()> {
+    let creator_ata = &ctx.accounts.creator_ata;
+    let from_ata = &ctx.accounts.from_ata;
     let token_program = &ctx.accounts.token_program;
     let creator = &ctx.accounts.creator;
     let mint = &ctx.accounts.mint;
 
-    let mint_ctx = CpiContext::new(
+    let withdraw_ctx = CpiContext::new(
         token_program.to_account_info(),
-        MintTo {
+        WithdrawWithheldTokensFromAccounts {
             authority: creator.to_account_info(),
             mint: mint.to_account_info(),
-            to: recipient_ata.to_account_info(),
+            destination: creator_ata.to_account_info(),
+            token_program_id: token_program.to_account_info(),
         },
     );
 
-    mint_to(mint_ctx, amount)?;
+    withdraw_withheld_tokens_from_accounts(withdraw_ctx, vec![from_ata.to_account_info()])?;
 
     Ok(())
 }
@@ -39,17 +37,24 @@ pub struct WithdrawContext<'info> {
         mint::token_program = token_program
     )]
     pub mint: InterfaceAccount<'info, Mint>,
-    /// Check: Recipient of the minted tokens
+    /// CHECK: Account from which the tokens will be withdrawn
     #[account(mut)]
-    pub recipient: UncheckedAccount<'info>,
+    pub from: UncheckedAccount<'info>,
+    #[account(
+        mut,
+        associated_token::mint = mint,
+        associated_token::authority = from,
+        associated_token::token_program = token_program
+    )]
+    pub from_ata: InterfaceAccount<'info, TokenAccount>,
     #[account(
         init_if_needed,
         payer = creator,
         associated_token::mint = mint,
-        associated_token::authority = recipient,
+        associated_token::authority = creator,
         associated_token::token_program = token_program
     )]
-    pub recipient_ata: InterfaceAccount<'info, TokenAccount>,
+    pub creator_ata: InterfaceAccount<'info, TokenAccount>,
     pub token_program: Program<'info, Token2022>,
     pub system_program: Program<'info, System>,
     pub associated_token_program: Program<'info, AssociatedToken>,

@@ -35,9 +35,9 @@ pub fn _transfer(ctx: Context<TransferContext>, amount: u64) -> Result<()> {
 pub struct TransferContext<'info> {
     #[account(mut)]
     pub sender: Signer<'info>,
-    /// Check: Mint of the token to transfer
+    /// CHECK: Mint of the token to transfer
     pub mint: UncheckedAccount<'info>,
-    /// Check: Recipient of the minted tokens
+    /// CHECK: Recipient of the minted tokens
     #[account(mut)]
     pub recipient: UncheckedAccount<'info>,
     #[account(

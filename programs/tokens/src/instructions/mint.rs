@@ -39,7 +39,7 @@ pub struct MintContext<'info> {
         mint::token_program = token_program
     )]
     pub mint: InterfaceAccount<'info, Mint>,
-    /// Check: Recipient of the minted tokens
+    /// CHECK: Recipient of the minted tokens
     #[account(mut)]
     pub recipient: UncheckedAccount<'info>,
     #[account(
