@@ -51,7 +51,7 @@ pub struct TransferContext<'info> {
     #[account(
         mut,
         associated_token::mint = mint,
-        associated_token::authority = recipient,
+        associated_token::authority = sender,
         associated_token::token_program = token_program
     )]
     pub sender_ata: InterfaceAccount<'info, TokenAccount>,

@@ -15,7 +15,7 @@ pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) 
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let creator = &ctx.accounts.creator;
-    let to = &ctx.accounts.mint;
+    let mint = &ctx.accounts.mint;
 
     let space =
         ExtensionType::try_calculate_account_len::<PodMint>(&[ExtensionType::TransferFeeConfig])?;
@@ -25,7 +25,7 @@ pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) 
         system_program.to_account_info(),
         CreateAccount {
             from: creator.to_account_info(),
-            to: to.to_account_info(),
+            to: mint.to_account_info(),
         },
     );
 
@@ -40,7 +40,7 @@ pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) 
         token_program.to_account_info(),
         TransferFeeInitialize {
             token_program_id: token_program.to_account_info(),
-            mint: to.to_account_info(),
+            mint: mint.to_account_info(),
         },
     );
 
@@ -52,14 +52,14 @@ pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) 
         max_fee,
     )?;
 
-    let initialize_mint_ctx = CpiContext::new(
+    let initalize_mint_ctx = CpiContext::new(
         token_program.to_account_info(),
         InitializeMint2 {
-            mint: to.to_account_info(),
+            mint: mint.to_account_info(),
         },
     );
 
-    initialize_mint2(initialize_mint_ctx, 9, &creator.key(), None)?;
+    initialize_mint2(initalize_mint_ctx, 9, &creator.key(), None)?;
 
     Ok(())
 }
