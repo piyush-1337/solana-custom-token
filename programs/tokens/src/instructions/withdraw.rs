@@ -5,7 +5,7 @@ use anchor_spl::{
     token_interface::{Mint, TokenAccount},
 };
 
-pub fn _mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
+pub fn _withdraw(ctx: Context<WithdrawContext>, amount: u64) -> Result<()> {
     if amount == 0 {
         panic!("Invalid amount");
     }
@@ -30,7 +30,7 @@ pub fn _mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
 }
 
 #[derive(Accounts)]
-pub struct MintContext<'info> {
+pub struct WithdrawContext<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
     #[account(

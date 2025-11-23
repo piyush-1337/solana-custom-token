@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 
-pub mod instructions;
-use instructions::initialize::*;
-use instructions::mint::*;
+mod instructions;
+use instructions::*;
 
 declare_id!("6s2aRCb8CdM793yTt8Xd8yfZ7b8xjd7tDwPWUYmiKkgp");
 
@@ -17,4 +16,13 @@ pub mod tokens {
     pub fn mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
         _mint(ctx, amount)
     }
+
+    pub fn transfer(ctx: Context<TransferContext>, amount: u64) -> Result<()> {
+        _transfer(ctx, amount)
+    }
+
+    pub fn withdraw(ctx: Context<WithdrawContext>, amount: u64) -> Result<()> {
+        _withdraw(ctx, amount)
+    }
+    
 }
