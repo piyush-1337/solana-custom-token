@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_2022::{Token2022, TransferChecked, transfer_checked},
+    token_2022::{transfer_checked, Token2022, TransferChecked},
     token_interface::TokenAccount,
 };
 

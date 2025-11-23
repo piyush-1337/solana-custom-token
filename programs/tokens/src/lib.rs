@@ -24,5 +24,4 @@ pub mod tokens {
     pub fn withdraw(ctx: Context<WithdrawContext>) -> Result<()> {
         _withdraw(ctx)
     }
-    
 }

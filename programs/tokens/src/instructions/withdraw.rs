@@ -2,7 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_2022::Token2022,
-    token_interface::{Mint, TokenAccount, WithdrawWithheldTokensFromAccounts, withdraw_withheld_tokens_from_accounts},
+    token_interface::{
+        withdraw_withheld_tokens_from_accounts, Mint, TokenAccount,
+        WithdrawWithheldTokensFromAccounts,
+    },
 };
 
 pub fn _withdraw(ctx: Context<WithdrawContext>) -> Result<()> {
