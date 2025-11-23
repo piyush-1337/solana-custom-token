@@ -17,6 +17,7 @@ anchor.setProvider(anchor.AnchorProvider.env());
 const program = anchor.workspace.Tokens as Program<Tokens>;
 const provider = anchor.getProvider() as anchor.AnchorProvider;
 const connection = provider.connection as unknown as Connection;
+let logSub;
 
 describe("token-example", () => {
   const creator = Keypair.generate();
@@ -27,6 +28,9 @@ describe("token-example", () => {
   before(async () => {
     await airdrop(connection, creator.publicKey);
     await airdrop(connection, recipient.publicKey);
+    logSub = provider.connection.onLogs(mintKeypair.publicKey, (log) => {
+      console.log("LOG:", log);
+    });
   });
 
   it("should initialize a mint with transfer fee extension", async () => {
@@ -161,6 +165,10 @@ describe("token-example", () => {
     console.log("ACCOUNT STATE AFTER WITHDRAW:");
     await logBalance("Creator", creatorAta);
     await logBalance("Recipient 2", recipient2Ata);
+  });
+
+  after(async () => {
+    provider.connection.removeOnLogsListener(logSub);
   });
 });
 
