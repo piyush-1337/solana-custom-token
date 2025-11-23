@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 use instructions::initialize::*;
+use instructions::mint::*;
 
 declare_id!("6s2aRCb8CdM793yTt8Xd8yfZ7b8xjd7tDwPWUYmiKkgp");
 
@@ -11,5 +12,9 @@ pub mod tokens {
 
     pub fn initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) -> Result<()> {
         _initialize(ctx, fee_bps, max_fee)
+    }
+
+    pub fn mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
+        _mint(ctx, amount)
     }
 }

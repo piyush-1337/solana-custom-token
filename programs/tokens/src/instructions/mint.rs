@@ -11,7 +11,7 @@ use anchor_spl::{
     token_interface::{transfer_fee_initialize, TransferFeeInitialize},
 };
 
-pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) -> Result<()> {
+pub fn _mint(ctx: Context<MintContext>, amount: u64) -> Result<()> {
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let creator = &ctx.accounts.creator;
@@ -36,36 +36,11 @@ pub fn _initialize(ctx: Context<InitializeContext>, fee_bps: u16, max_fee: u64) 
         &token_program.key(),
     )?;
 
-    let transfer_fee_init_ctx = CpiContext::new(
-        token_program.to_account_info(),
-        TransferFeeInitialize {
-            token_program_id: token_program.to_account_info(),
-            mint: to.to_account_info(),
-        },
-    );
-
-    transfer_fee_initialize(
-        transfer_fee_init_ctx,
-        None,
-        Some(&creator.key()),
-        fee_bps,
-        max_fee,
-    )?;
-
-    let initialize_mint_ctx = CpiContext::new(
-        token_program.to_account_info(),
-        InitializeMint2 {
-            mint: to.to_account_info(),
-        },
-    );
-
-    initialize_mint2(initialize_mint_ctx, 9, &creator.key(), None)?;
-
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct InitializeContext<'info> {
+pub struct MintContext<'info> {
     #[account(mut)]
     pub creator: Signer<'info>,
     #[account(mut)]
